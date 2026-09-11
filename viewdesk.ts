@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import http from "http";
 import { Server as SocketServer, Socket } from "socket.io";
 import { mouse, keyboard, Button, Key } from "@nut-tree-fork/nut-js";
-import { execSync } from "child_process";
+import { execSync, exec } from "child_process";
 import fs from "fs";
 import path from "path";
 import os from "os";
@@ -351,10 +351,10 @@ app.get("/", (_req: Request, res: Response) => {
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    // central cloud signaling server on Render.com
-    const CLOUD_SIGNALING_URL = "https://remoteview-bdjo.onrender.com"; 
+    // Central cloud signaling server on Render.com
+    const CLOUD_SIGNALING_URL = "https://viewdesk-server-fu88x.onrender.com"; 
 
-    // Connects to Render if running as a client app, or local if hosted on server
+    // Connects to Render if running as a client app, or local origin if hosted on server
     const SOCKET_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
       ? CLOUD_SIGNALING_URL 
       : window.location.origin;
@@ -628,20 +628,36 @@ io.on("connection", (socket: Socket) => {
 });
 
 // ===========================================================================
-// 7. START ENGINE
+// 7. START ENGINE & AUTO-OPEN BROWSER
 // ===========================================================================
 function startServer(port: number) {
   server
     .listen(port)
     .on("listening", () => {
+      const url = `http://localhost:${port}`;
       console.log(`
 ==================================================
   ViewDesk Engine (${DEVELOPER_NAME})
   PC Hardware ID   : ${PC_VIEWDESK_ID}
   Session Password : ${PC_SESSION_PASSWORD}
   Listening Port   : ${port}
+  Browser Console  : ${url}
 ==================================================
       `);
+
+      // Automatically open the local interface in default web browser
+      const openCommand =
+        process.platform === "win32"
+          ? `start ${url}`
+          : process.platform === "darwin"
+          ? `open ${url}`
+          : `xdg-open ${url}`;
+
+      exec(openCommand, (err) => {
+        if (err) {
+          console.error("[ViewDesk] Failed to open default browser automatically:", err);
+        }
+      });
     })
     .on("error", (err: any) => {
       if (err.code === "EADDRINUSE") {

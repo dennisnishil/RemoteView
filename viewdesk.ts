@@ -352,7 +352,7 @@ app.get("/", (_req: Request, res: Response) => {
   <script src="/socket.io/socket.io.js"></script>
   <script>
     // central cloud signaling server on Render.com
-    const CLOUD_SIGNALING_URL = "https://viewdesk-server.onrender.com"; 
+    const CLOUD_SIGNALING_URL = "https://remoteview-bdjo.onrender.com"; 
 
     // Connects to Render if running as a client app, or local if hosted on server
     const SOCKET_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
